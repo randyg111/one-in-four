@@ -243,6 +243,43 @@ const Home = () => {
 
     setScore(nextScore);
   };
+
+  const handleShuffleClick = () => {
+    const list = [];
+    for (let i = 0; i < 5 - rows; i++) {
+      for (let j = 0; j < 4; j++) {
+        const word = grid[i][j];
+        if (word) {
+          list.push(word);
+        } else {
+          for (const s of aboveGrid) {
+            if (buttonPositions.get(s)?.row == i && buttonPositions.get(s)?.col == j) {
+              list.push(s);
+            }
+          }
+        }
+      }
+    }
+    // shuffle
+    for (let i = list.length - 1; i >= 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    const nextGrid = [...grid];
+    for (let i = 0; i < list.length; i++) {
+      const r = Math.floor(i / 4);
+      const c = i % 4;
+      buttonPositions.set(list[i], {row: r, col: c});
+      nextGrid[r][c] = aboveGrid.includes(list[i]) ? "" : list[i];
+    }
+    setGrid(nextGrid);
+  }
+
+  const handleResetClick = () => {
+    setSearchParams("");
+    window.location.reload();
+  }
+
   const list = [];
   for(let i = 0; i < found.length; i += 12) {
     const text = [];
@@ -302,9 +339,17 @@ const Home = () => {
           )}
         </div>
 
-        <button className="submit-button" onClick={() => handleSubmitClick()}>
-          ✓
-        </button>
+        <div className="bottom-container">
+          <button className="extra-button" onClick={() => handleShuffleClick()}>
+            ⇄
+          </button>
+          <button className="submit-button" onClick={() => handleSubmitClick()}>
+            ✓
+          </button>
+          <button className="extra-button" onClick={() => handleResetClick()}>
+            ↺
+          </button>
+        </div>
       </div>
       <div className="text-container">
         {list}
